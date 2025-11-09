@@ -23,7 +23,7 @@ public class JpaConfig {
 
     private final Environment env;
 
-    private JpaConfig(Environment env) {
+    public JpaConfig(Environment env) {
         this.env = env;
     }
 
@@ -62,7 +62,7 @@ public class JpaConfig {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
         properties.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
-        properties.put("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
+        properties.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
         return properties;
     }
 }

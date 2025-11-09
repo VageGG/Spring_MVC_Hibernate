@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private UserDao userDao;
+    private final UserDao userDao;
 
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
@@ -29,8 +29,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void saveOrUpdateUser(User user) {
-        userDao.saveOrUpdateUser(user);
+    public void saveUser(User user) {
+        userDao.saveUser(user);
+    }
+
+    @Transactional
+    @Override
+    public void updateUser(User user) {
+        userDao.updateUser(user);
     }
 
     @Transactional

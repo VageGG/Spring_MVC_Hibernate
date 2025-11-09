@@ -1,6 +1,5 @@
 package org.example.config;
 
-import jakarta.servlet.ServletConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
@@ -11,7 +10,7 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class<?>[]{ServletConfig.class};
+        return new Class<?>[]{SpringConfig.class};
     }
 
     @Override
