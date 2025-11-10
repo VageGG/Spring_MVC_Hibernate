@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users CRUD</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .form-container { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .error-message { background-color: #ffebee; color: #c62828; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<h1>Users Management</h1>
+
+<div th:if="${error}" class="error-message" th:text="${error}">error</div>
+
+<div class="form-container">
+    <h2>Add New User</h2>
+    <form th:action="@{/users/add}" method="post">
+        <label>Name:</label>
+        <input type="text" name="name" required>
+
+        <label>Age:</label>
+        <input type="number" name="age">
+
+        <label>Email:</label>
+        <input type="email" name="email" required>
+
+        <button type="submit">Add User</button>
+    </form>
+</div>
+
+<div class="form-container" th:if="${user != null}">
+    <h2>Edit User</h2>
+    <form th:action="@{/users/update}" method="post">
+        <input type="hidden" name="id" th:value="${user.id}">
+
+        <label>Name:</label>
+        <input type="text" name="name" th:value="${user.name}" required>
+
+        <label>Age:</label>
+        <input type="number" name="age" th:value="${user.age}">
+
+        <label>Email:</label>
+        <input type="email" name="email" th:value="${user.email}" required>
+
+        <button type="submit">Update User</button>
+        <a th:href="@{/users}">Cancel</a>
+    </form>
+</div>
+
+<h2>Users List</h2>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.age}"></td>
+        <td th:text="${user.email}"></td>
+        <td>
+            <form th:action="@{/users/edit}" method="get" style="display: inline;">
+                <input type="hidden" name="id" th:value="${user.id}">
+                <button type="submit">Edit</button>
+            </form>
+
+            <form th:action="@{/users/delete}" method="post" style="display: inline;">
+                <input type="hidden" name="id" th:value="${user.id}">
+                <button type="submit" onclick="return confirm('Delete this user?')">Delete</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
