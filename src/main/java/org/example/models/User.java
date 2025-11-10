@@ -18,7 +18,7 @@ public class User {
     @Column(nullable = false, length = 50)
     private String name;
     @Column
-    private int age;
+    private Integer age;
     @Column(unique = true, nullable = false)
     private String email;
 
@@ -38,11 +38,11 @@ public class User {
         this.name = name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 

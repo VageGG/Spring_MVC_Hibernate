@@ -2,6 +2,7 @@ package org.example.controllers;
 
 import org.example.models.User;
 import org.example.service.UserService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,7 @@ public class UserController {
     }
 
     @GetMapping
-    public String getShowAllUsers(@RequestParam(value = "id", required = false) Long id,
-                                  Model model) {
+    public String getShowAllUsers(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         return "users";
     }
@@ -29,14 +29,20 @@ public class UserController {
     public String addUser(
             @RequestParam("name") String name,
             @RequestParam(value = "age", required = false) Integer age,
-            @RequestParam("email") String email) {
+            @RequestParam("email") String email,
+            Model model) {
 
         User user = new User();
         user.setName(name);
         user.setAge(age);
         user.setEmail(email);
-        userService.saveUser(user);
-        return "redirect:/users";
+        try {
+            userService.saveUser(user);
+            return "redirect:/users";
+        } catch (DataIntegrityViolationException | IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "users";
+        }
     }
 
     @PostMapping("/update")
@@ -44,15 +50,21 @@ public class UserController {
             @RequestParam("id") Long id,
             @RequestParam("name") String name,
             @RequestParam(value = "age", required = false) Integer age,
-            @RequestParam("email") String email) {
+            @RequestParam("email") String email,
+            Model model) {
 
         User user = new User();
         user.setId(id);
         user.setName(name);
         user.setAge(age);
         user.setEmail(email);
-        userService.updateUser(user);
-        return "redirect:/users";
+        try {
+            userService.updateUser(user);
+            return "redirect:/users";
+        } catch (DataIntegrityViolationException | IllegalArgumentException e) {
+            model.addAttribute("error", e.getMessage());
+            return "users";
+        }
     }
 
     @PostMapping("/delete")

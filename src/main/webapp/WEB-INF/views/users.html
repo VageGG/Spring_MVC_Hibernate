@@ -8,10 +8,13 @@
         th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
         th { background-color: #f2f2f2; }
         .form-container { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .error-message { background-color: #ffebee; color: #c62828; padding: 10px; margin: 10px 0; border-radius: 4px; }
     </style>
 </head>
 <body>
 <h1>Users Management</h1>
+
+<div th:if="${error}" class="error-message" th:text="${error}">error</div>
 
 <div class="form-container">
     <h2>Add New User</h2>
