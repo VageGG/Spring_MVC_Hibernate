@@ -1,6 +1,8 @@
-package org.example.controllers;
+package org.example.controller;
 
-import org.example.models.User;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
+import org.example.model.User;
 import org.example.service.UserService;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -39,7 +41,7 @@ public class UserController {
         try {
             userService.saveUser(user);
             return "redirect:/users";
-        } catch (DataIntegrityViolationException | IllegalArgumentException e) {
+        } catch (DataIntegrityViolationException | IllegalArgumentException | ConstraintViolationException e) {
             model.addAttribute("error", e.getMessage());
             return "users";
         }
@@ -61,7 +63,7 @@ public class UserController {
         try {
             userService.updateUser(user);
             return "redirect:/users";
-        } catch (DataIntegrityViolationException | IllegalArgumentException e) {
+        } catch (DataIntegrityViolationException | IllegalArgumentException | ConstraintViolationException e) {
             model.addAttribute("error", e.getMessage());
             return "users";
         }
@@ -75,8 +77,12 @@ public class UserController {
 
     @GetMapping("/edit")
     public String showEditForm(@RequestParam("id") Long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
+        try {
+            User user = userService.getUserById(id);
+            model.addAttribute("user", user);
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("error", "User not found");
+        }
         model.addAttribute("users", userService.getAllUsers());
         return "users";
     }

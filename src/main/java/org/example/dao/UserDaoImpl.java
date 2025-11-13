@@ -2,14 +2,13 @@ package org.example.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.example.models.User;
+import org.example.model.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Repository
-@Transactional
 public class UserDaoImpl implements UserDao {
     @PersistenceContext
     private EntityManager em;
@@ -45,5 +44,12 @@ public class UserDaoImpl implements UserDao {
         if (user != null) {
             em.remove(user);
         }
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return em.createQuery("SELECT COUNT(u) FROM User u WHERE u.email = :email", Long.class)
+                .setParameter("email", email)
+                .getSingleResult() > 0;
     }
 }

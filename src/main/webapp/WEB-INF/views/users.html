@@ -14,7 +14,10 @@
 <body>
 <h1>Users Management</h1>
 
-<div th:if="${error}" class="error-message" th:text="${error}">error</div>
+<div th:if="${error}" class="error-message">
+    <p th:text="${error}"></p>
+    <a th:href="@{/users}">Back to the users list</a>
+</div>
 
 <div class="form-container">
     <h2>Add New User</h2>

@@ -14,6 +14,9 @@
         <hibernate.version>7.1.6.Final</hibernate.version>
         <mySQL.version>9.4.0</mySQL.version>
         <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
+        <jak-valid.version>3.1.1</jak-valid.version>
+        <jakarta.el.version>4.0.2</jakarta.el.version>
+        <hib-valid.version>9.0.1.Final</hib-valid.version>
 
         <java.version>17</java.version>
         <maven.compile.source>17</maven.compile.source>
@@ -67,6 +70,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>${jakarta.el.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>${hibernate.version}</version>
@@ -81,6 +90,17 @@
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring6</artifactId>
             <version>${thymeleaf.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>${jak-valid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hib-valid.version}</version>
         </dependency>
 
     </dependencies>

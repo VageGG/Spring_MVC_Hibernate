@@ -1,18 +1,23 @@
 package org.example.service;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.example.dao.UserDao;
-import org.example.models.User;
+import org.example.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Objects;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserDao userDao;
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
 
     public UserServiceImpl(UserDao userDao) {
         this.userDao = userDao;
@@ -29,7 +34,7 @@ public class UserServiceImpl implements UserService {
     public User getUserById(Long id) {
         User user = userDao.getUserById(id);
         if (user == null) {
-            throw new IllegalArgumentException("User not found with id: " + id);
+            throw new EntityNotFoundException("User not found with id: " + id);
         }
         return user;
     }
@@ -44,6 +49,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUser(User user) {
+        if (userDao.getUserById(user.getId()) == null) {
+            throw new EntityNotFoundException("User not found with id: " + user.getId());
+        }
         validateUser(user);
         userDao.updateUser(user);
     }
@@ -55,32 +63,27 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateUser(User user) {
-
-        if (user.getName() == null || user.getName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Name is required");
-        } else if (user.getName().trim().length() < 2) {
-            throw new IllegalArgumentException("Name must be at least 2 characters long");
-        } else if (user.getName().trim().length() > 50) {
-            throw new IllegalArgumentException("Name must be no more than 50 characters long");
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            String message = violations.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .findFirst()
+                    .orElse("Validation failed");
+            throw new IllegalArgumentException(message);
         }
 
-        if (user.getAge() < 0) {
-            throw new IllegalArgumentException("Age must be positive");
-        } else if (user.getAge() > 150) {
-            throw new IllegalArgumentException("Age must be realistic (max 150)");
-        }
-
-        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("Email is required");
-        } else if (!validateEmail(user.getEmail().trim())) {
-            throw new IllegalArgumentException("Email should be valid");
-        } else if (user.getEmail().trim().length() > 100) {
-            throw new IllegalArgumentException("Email must be no more than 100 characters long");
+        if (user.getId() == null) {
+            if (userDao.existsByEmail(user.getEmail())) {
+                throw new IllegalArgumentException("Email already exists");
+            }
+        } else {
+            User existing = userDao.getUserById(user.getId());
+            if (!Objects.equals(existing.getEmail(), user.getEmail()) &&
+                    userDao.existsByEmail(user.getEmail())) {
+                throw new IllegalArgumentException("Email already exists");
+            }
         }
     }
-
-    private boolean validateEmail(String email) {
-        return EMAIL_PATTERN.matcher(email).matches();
-    }
-
 }
