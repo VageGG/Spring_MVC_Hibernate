@@ -9,6 +9,9 @@
         th { background-color: #f2f2f2; }
         .form-container { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
         .error-message { background-color: #ffebee; color: #c62828; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .error-field { border: 1px solid #c62828; }
+        .field-error { color: #c62828; font-size: 0.9em; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -20,37 +23,50 @@
 </div>
 
 <div class="form-container">
-    <h2>Add New User</h2>
-    <form th:action="@{/users/add}" method="post">
-        <label>Name:</label>
-        <input type="text" name="name" required>
+    <h2 th:text="${userForm?.id != null} ? 'Edit User' : 'Add New User'">
+        Add/Edit User
+    </h2>
 
-        <label>Age:</label>
-        <input type="number" name="age">
+    <form th:action="@{/users/add}" method="post" th:object="${userForm}">
+        <input type="hidden" th:field="*{id}">
 
-        <label>Email:</label>
-        <input type="email" name="email" required>
+        <div>
+            <label>Name:</label>
+            <input type="text" th:field="*{name}"
+                   th:classappend="${#fields.hasErrors('name')} ? 'error-field' : ''"
+                   required>
+            <div th:if="${#fields.hasErrors('name')}" class="field-error">
+                <span th:errors="*{name}"></span>
+            </div>
+        </div>
 
-        <button type="submit">Add User</button>
-    </form>
-</div>
+        <div>
+            <label>Age:</label>
+            <input type="number" th:field="*{age}"
+                   th:classappend="${#fields.hasErrors('age')} ? 'error-field' : ''"
+                   required min="0" max="130">
+            <div th:if="${#fields.hasErrors('age')}" class="field-error">
+                <span th:errors="*{age}"></span>
+            </div>
+        </div>
 
-<div class="form-container" th:if="${user != null}">
-    <h2>Edit User</h2>
-    <form th:action="@{/users/update}" method="post">
-        <input type="hidden" name="id" th:value="${user.id}">
+        <div>
+            <label>Email:</label>
+            <input type="email" th:field="*{email}"
+                   th:classappend="${#fields.hasErrors('email')} ? 'error-field' : ''"
+                   required>
+            <div th:if="${#fields.hasErrors('email')}" class="field-error">
+                <span th:errors="*{email}"></span>
+            </div>
+        </div>
 
-        <label>Name:</label>
-        <input type="text" name="name" th:value="${user.name}" required>
+        <button type="submit" th:text="${userForm?.id != null} ? 'Update User' : 'Add User'">
+            Add/Update User
+        </button>
 
-        <label>Age:</label>
-        <input type="number" name="age" th:value="${user.age}">
-
-        <label>Email:</label>
-        <input type="email" name="email" th:value="${user.email}" required>
-
-        <button type="submit">Update User</button>
-        <a th:href="@{/users}">Cancel</a>
+        <a th:if="${userForm?.id != null}" th:href="@{/users}" style="margin-left: 10px;">
+            Cancel
+        </a>
     </form>
 </div>
 
@@ -72,8 +88,8 @@
         <td th:text="${user.age}"></td>
         <td th:text="${user.email}"></td>
         <td>
-            <form th:action="@{/users/edit}" method="get" style="display: inline;">
-                <input type="hidden" name="id" th:value="${user.id}">
+            <form th:action="@{/users}" method="get" style="display: inline;">
+                <input type="hidden" name="editId" th:value="${user.id}">
                 <button type="submit">Edit</button>
             </form>
 

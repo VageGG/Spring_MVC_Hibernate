@@ -1,10 +1,6 @@
 package org.example.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import org.example.dao.UserDao;
 import org.example.model.User;
 import org.springframework.stereotype.Service;
@@ -12,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -41,19 +36,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void saveUser(User user) {
-        validateUser(user);
-        userDao.saveUser(user);
-    }
-
-    @Transactional
-    @Override
-    public void updateUser(User user) {
-        if (userDao.getUserById(user.getId()) == null) {
-            throw new EntityNotFoundException("User not found with id: " + user.getId());
-        }
-        validateUser(user);
-        userDao.updateUser(user);
+    public void saveOrUpdateUser(User user) {
+        existsEmail(user);
+        userDao.saveOrUpdateUser(user);
     }
 
     @Transactional
@@ -62,18 +47,7 @@ public class UserServiceImpl implements UserService {
         userDao.deleteUser(id);
     }
 
-    private void validateUser(User user) {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-        if (!violations.isEmpty()) {
-            String message = violations.stream()
-                    .map(ConstraintViolation::getMessage)
-                    .findFirst()
-                    .orElse("Validation failed");
-            throw new IllegalArgumentException(message);
-        }
-
+    private void existsEmail(User user) {
         if (user.getId() == null) {
             if (userDao.existsByEmail(user.getEmail())) {
                 throw new IllegalArgumentException("Email already exists");
